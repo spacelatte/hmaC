@@ -1,0 +1,4 @@
+*.o
+a.out
+DerivedData
+.DS_Store
