@@ -1,0 +1,189 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title> hmaC - hmac hash implementations for bare C </title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="./materialize.min.css">
+		<style type="text/css">
+			body {
+				display: flex;
+				min-height: 100vh;
+				flex-direction: column;
+			}
+			main {
+				flex: 1 0 auto;
+			}
+			code {
+				white-space: pre-wrap;
+			}
+			.row {
+				margin-top: 2.5%;
+			}
+			a.btn-floating.btn-large.right.hoverable {
+				margin: 2.0%;
+				background-image: url("./clippy.svg");
+				background-repeat: no-repeat;
+				background-size: 50%;
+				background-position: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="navbar-fixed">
+			<nav class="blue-grey darken-1">
+				<div class="nav-wrapper">
+					<a href="//github.com/pvtmert/hmaC" class="brand-logo right">hmaC</a>
+					<ul id="nav-mobile" class="left">
+						<li><a href="#top">main()</a></li>
+						<li><a href="#code">help()</a></li>
+						<li><a href="//github.com/pvtmert/hmaC/tree/master/readme.md">license()</a></li>
+					</ul>
+				</div>
+			</nav>
+		</div>
+		<main class="container">
+			<h1>hmaC - HMAC for C</h1>
+			<h5><i>includes hash functions</i></h5>
+			<section class="flow-text">
+				<p>This is a pure C implementation of HMAC and related hash functions to be used in embedded applications or environments that are not containing such hash functions, ssl libraries etc.</p>
+			</section>
+			<div class="divider"></div>
+			<section class="flow-text">
+				<p>
+					But Why?<br />
+					Well, in these days encryption is important and de-facto standard when it comes to communications. But embedded industry follows a bit behind than servers. So in order to identify messages HMAC is being used. (eg: HTTP Authorization header)
+				</p>
+				<p>
+					Let's say you wanted your coffee machine to tweet you when your coffee is ready, you use ESP8266 but cannot use Twitter REST api directly because it requires you to HMAC-MD5 your keys with your data and send it. So you put a gateway (eg: Amazon Lambda) to add these to message. Say no more to this. Communicate directly with the host, reduced latency, complexity for your app :)
+				</p>
+			</section>
+			<div class="divider" id=code ></div>
+			<div class="row">
+				<div class="col s12 m6">
+					<div class="hoverable card blue-grey darken-1">
+						<a class="btn-floating btn-large hoverable right white"></a>
+						<div class="card-content white-text">
+							<span class="card-title">Example HMAC-MD5</span>
+<code>
+#include "hmac.h"
+
+const char *key = "secretkey";
+const char *msg = "message to be hashed";
+
+void *bytes[MD5HashSize];
+
+hmac_md5(
+	msg, strlen(msg),
+	key, strlen(key),
+	bytes
+);
+
+char *hexdigest = btoa(bytes, MD5HashSize);
+printf(hexdigest);
+</code>
+						</div>
+					</div>
+				</div>
+				<div class="flow-text col s12 m6">
+					<p>
+						First we allocate target with pre-defined <code>MD5HashSize</code> constant<br />
+						then passing data to function which in result writes to the <code>bytes</code> array.
+					</p>
+					<div class="divider"></div>
+					<p>
+						We use <code>btoa</code> to get hex digest (hexadecimal string) of our hash.<br />
+						Since our hash is binary (0-255) we can use this function to send it as HTTP header in our application for example.<br />
+					</p>
+				</div>
+			</div>
+			<div class="divider" ></div>
+			<div class="row">
+				<div class="col s12 m6">
+					<div class="hoverable card blue-grey darken-1">
+						<a class="btn-floating btn-large hoverable right white"></a>
+						<div class="card-content white-text">
+							<span class="card-title">Example HMAC-SHA1</span>
+<code>
+#include "hmac.h"
+
+const char *key = "secretkey";
+const char *msg = "message to be hashed";
+
+void *bytes[SHA1HashSize];
+
+hmac_sha1(
+	msg, strlen(msg),
+	key, strlen(key),
+	bytes
+);
+
+char *hexdigest = btoa(bytes, SHA1HashSize);
+printf(hexdigest);
+</code>
+						</div>
+					</div>
+				</div>
+				<div class="flow-text col s12 m6">
+					<p>
+						First we allocate target with pre-defined <code>SHA1HashSize</code> constant<br />
+						then passing data to function which in result writes to the <code>bytes</code> array.
+					</p>
+					<div class="divider"></div>
+					<p>
+						Also there is <code>atob</code> function which takes hex string and returns binary representation (<code>void*</code>).
+					</p>
+				</div>
+			</div>
+			<section class="flow-text">
+				<p id=license ></p>
+			</section>
+		</main>
+		<footer class="page-footer blue-grey darken-1">
+			<div class="container">
+				<div class="row">
+					<div class="col l6 s12">
+						<h5 class="white-text">hmaC</h5>
+						<p class="grey-text text-lighten-4">pure C implementation of hmac and related functions</p>
+					</div>
+					<div class="col l4 offset-l2 s12">
+						<h5 class="white-text">Links</h5>
+						<ul>
+							<li><a class="grey-text text-lighten-3" href="#">Top</a></li>
+							<li><a class="grey-text text-lighten-3" href="#">help()</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<script type="text/javascript" src="./clipboard.min.js"></script>
+		<script>
+			window.onload = function(e) {
+				new Clipboard(".card", {
+					target: function(e) {
+						return e.querySelector("code")
+					}
+				}).on("success", function(e) {
+					let title = e.trigger.querySelector(".card-title")
+					let orig = title.innerHTML
+					title.innerHTML = "copied!"
+					setTimeout(function(e) {
+						title.innerHTML = orig
+						return
+					}, 999)
+					e.clearSelection()
+				})
+				let xhr = new XMLHttpRequest()
+				xhr.addEventListener("loadend", function(e) {
+					if(this.status !== 200) {
+						return
+					}
+					document.querySelector("#license").innerHTML = this.response
+					return
+				})
+				xhr.open("GET", "//raw.githubusercontent.com/pvtmert/hmaC/master/license.md", true)
+				xhr.send(null)
+				return
+			}
+		</script>
+	</body>
+</html>
